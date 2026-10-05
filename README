@@ -1,0 +1,46 @@
+# Taskbar Control
+
+## Getting started
+
+1. When upgrading, exit the old copy once through its tray menu: **Exit and restore taskbar buttons**.
+2. Extract this ZIP to a permanent folder and open **TaskbarControl.exe**. Your existing settings load from your Windows account; they are not included in this package.
+3. Use **Pick a window** to hide an app's taskbar button immediately. Turn **Show** on to restore it.
+4. Minimize or close the editor to leave it in the tray. Open TaskbarControl.exe, its shortcut, or the tray icon to reopen the existing window.
+
+The preceding build's Xbox and ROTK taskbar hiding with Alt+Tab preserved was confirmed by a user on their PC. This update keeps the same embedded native hiding component. Compatibility still depends on Windows' taskbar build and layout. If something fails, use the error log and **Diagnostics > Copy report**. **Reconnect taskbar** retries the built-in connection.
+
+## Taskbar-only hiding
+
+The previous DeleteTab method also removed apps from Alt+Tab on the reported PC. This version does not use DeleteTab to hide apps. An embedded native component runs inside Explorer and collapses matching taskbar button visuals. It leaves target windows, styles, owners, and processes unchanged. A one-time AddTab request repairs membership an older session may have removed.
+
+This uses private Windows taskbar interfaces. It checks the running taskbar build and rejects unsupported layouts instead of falling back to the older hiding method. Windows updates, alternative taskbars, and other customizations can affect compatibility. A brief button flash can occur during creation or refresh. Notification badges are not disabled.
+
+Two Windows builds have verified compatibility metadata embedded for offline startup. Other builds require a matching public Taskbar.pdb download from Microsoft's symbol server, cached locally. This typically requires several megabytes once per taskbar build. No rules or personal files are uploaded. Setup failures are displayed and leave buttons visible.
+
+## Controls
+
+- **Pick a window:** add an open app with Show off. The picker intercepts the selection gesture so it does not press controls or close that app. Escape cancels.
+- **Show on / off:** restore the visual override or request hiding. Existing app tray icons stay available.
+- **Add executable / folder:** browse or scan for executables. New entries default to Show on. Nothing is launched; scans are cancellable.
+- **Saved folders / Rescan / Add running apps:** manage scan locations and recognized open applications.
+- **Pause hiding / Show all apps:** temporarily restore buttons or clear all hide choices.
+- **Hide my taskbar icon:** retain tray access to Taskbar Control. This separate setting can remove Taskbar Control itself from Alt+Tab; it is not the method used for listed apps.
+- **Start with Windows:** start in the tray at sign-in. Defaults on for new users and respects existing opt-outs.
+- **Minimize / Close:** leave the editor fully hidden in the tray, without a small minimized caption on the desktop. Open the EXE or shortcut again to restore and focus it. Use **Exit and restore taskbar buttons** to quit.
+- **Error log:** the area below the controls shows recent errors with plain-language explanations and suggested next steps. **Copy details** preserves original codes for troubleshooting; **Clear log** clears the history. Routine success messages are not displayed there.
+
+Hosted Windows apps are matched by their specific identity rather than a broad ApplicationFrameHost rule. Packaged-app identity matching can survive executable folder changes after updates.
+
+## Recovery and removal
+
+Show on, Pause, and Exit request restoration. If the app stops responding, the helper expires rules after about 3.5 seconds and restores visuals when Explorer's UI thread next runs. A hung Explorer can delay this. The helper stops its timer and removes callbacks when idle. Its DLL remains loaded but inactive until Explorer exits; no system files or injection startup registry entries are changed.
+
+To remove the app, turn off Start with Windows, exit through the tray menu, and delete the extracted folder. Local settings and caches remain in `%LOCALAPPDATA%\TaskbarControl` until deleted. Removing a loaded runtime DLL may require signing out. To return to the previous release, exit this build and open the older EXE; do not run both at once.
+
+## Local data and resources
+
+Rules and preferences are stored in `%LOCALAPPDATA%\TaskbarControl\settings.json`, with a backup of the previous save. Runtime files and Microsoft symbols are cached beneath the same directory. Replacing the app folder preserves settings. Download packages exclude all local rules, reports, caches, and personal scan locations.
+
+The error log holds up to 50 recent entries in memory and is cleared on exit. Recognized Windows errors receive specific guidance; unknown errors are identified as unknown rather than assigned a guessed cause. Technical details are copied only when requested. Reopening uses Windows messages and adds no background polling loop.
+
+There is no browser engine, continuous folder scan, game hook, or controller translation. Window events and a one-second fallback discover apps. While actively hiding, local heartbeat and visual checks run about every 750 ms. Polling stops once restoration completes and the helper becomes idle. See VALIDATION.md for measured scope; active hiding and game FPS have not been benchmarked on the live desktop.
